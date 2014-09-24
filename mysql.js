@@ -26,7 +26,7 @@ module.exports = require('eden-class').extend(function() {
 			.test(2, 'int', 'null')
 			.test(3, 'string')
 			.test(4, 'string')
-			.test(5, 'string', 'undef')
+			.test(5, 'string', 'undef');
 		
 		pass = pass || '';
 		port = port || 3306;
