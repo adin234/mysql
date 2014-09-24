@@ -1,7 +1,7 @@
 var assert = require('assert');
 var mysql = require('../mysql');
 
-var database = mysql('localhost', 'blog', 'root');
+var database = mysql('localhost', 3306, 'blog', 'root');
 
 describe('MySQL Model Test Suite', function() {
 	describe('Functional Tests', function() {

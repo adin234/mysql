@@ -1,7 +1,7 @@
 {
   "name": "eden-mysql",
   "description": "Eden Node JS MySQL Library",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "author": {
     "name": "Christian Blanquera",
     "email": "cblanquera@openovate.com"

@@ -20,15 +20,16 @@ module.exports = require('eden-class').extend(function() {
 	
 	/* Magic
 	-------------------------------*/
-	this.___construct = function(host, name, user, pass) {
+	this.___construct = function(host, port, name, user, pass) {
 		this.argument()
 			.test(1, 'string', 'object')
-			.test(2, 'string')
+			.test(2, 'int', 'null')
 			.test(3, 'string')
-			.test(4, 'string', 'undef')
+			.test(4, 'string')
+			.test(5, 'string', 'undef')
 		
 		pass = pass || '';
-		
+		port = port || 3306;
 		if(typeof host === 'object') {
 			this._config = host;
 			return;
@@ -37,7 +38,8 @@ module.exports = require('eden-class').extend(function() {
 		this._config = {
 			host		: host,
 			user		: user,
-			password	: pass,
+			port		: port,
+			password	: pass || '',
 			database	: name };	
 	};
 	
@@ -322,9 +324,9 @@ module.exports = require('eden-class').extend(function() {
 		//prepare the query
 		query = this._connection.format(query, bindings);
 		
-		var queries = this._queries;
-		
 		this._connection.query(query, callback);
+		
+		return this;
 	};
 	
 	/**
@@ -351,6 +353,11 @@ module.exports = require('eden-class').extend(function() {
 			.test(1, 'string')
 			.test(2, 'string', 'array')
 			.test(3, 'function', 'undef');
+		
+		if(!filters.length) {
+			callback(new Error('Filters cannot be empty.'));
+			return;
+		}
 		
 		var query = this.remove(table), bindings = [];
 		

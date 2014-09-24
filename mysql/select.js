@@ -21,7 +21,7 @@ module.exports = require('eden-class').extend(function() {
 	/* Magic
 	-------------------------------*/
 	this.___construct = function(select) {
-		this.argument().test(1, 'string', 'undef');	
+		this.argument().test(1, 'string', 'array', 'undef');	
 		
 		this.select(select || '*');
 	};

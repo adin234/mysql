@@ -137,7 +137,7 @@ module.exports = require('eden-model').extend(function() {
 				//only if we have 1 primary key
 				if(meta[PRIMARY].length === 1) {
 					//set the primary key
-					_data[meta[PRIMARY]] = info.insertId;
+					_data[meta[PRIMARY][0]] = info.insertId;
 				}
 				
 				callback(error, instance, info);
@@ -412,7 +412,7 @@ module.exports = require('eden-model').extend(function() {
 	}
 	
 	this._getMeta = function(table, database, callback) {
-		if(typeof database.____MYSQL_MODEL_UID) {
+		if(typeof database.____MYSQL_MODEL_UID === 'undefined') {
 			database.____MYSQL_MODEL_UID = ++__uid;
 		}
 		
