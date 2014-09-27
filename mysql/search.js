@@ -118,6 +118,7 @@ module.exports = require('eden-class').extend(function() {
 	/**
 	 * Returns the results in a collection
 	 *
+	 * @param function callback
 	 * @return this
 	 */
 	this.getCollection = function(callback) {
@@ -143,7 +144,7 @@ module.exports = require('eden-class').extend(function() {
 	 * Returns the one result in a model
 	 *
 	 * @param int
-	 * @param function
+	 * @param function callback
 	 * @return this
 	 */
 	this.getModel = function(index, callback) {
@@ -168,6 +169,7 @@ module.exports = require('eden-class').extend(function() {
 	 *
 	 * @param int|string
 	 * @param string|null
+	 * @param function callback
 	 * @return this
 	 */
 	this.getRow = function(index, column, callback) {
@@ -211,6 +213,7 @@ module.exports = require('eden-class').extend(function() {
 	/**
 	 * Returns the array rows
 	 *
+	 * @param function callback
 	 * @return this
 	 */
 	this.getRows = function(callback) {
@@ -240,6 +243,7 @@ module.exports = require('eden-class').extend(function() {
 	/**
 	 * Returns the total results
 	 *
+	 * @param function callback
 	 * @return this
 	 */
 	this.getTotal = function(callback) {

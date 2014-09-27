@@ -90,7 +90,8 @@ module.exports = require('eden-collection').extend(function() {
 	/**
 	 * Sets the default database
 	 *
-	 * @param Eden_Sql
+	 * @param eden/mysql
+	 * @return this
 	 */
 	this.setDatabase = function(database) {
 		this.argument().test(1, 'object');
@@ -108,13 +109,13 @@ module.exports = require('eden-collection').extend(function() {
 	 * Sets the default database
 	 *
 	 * @param string
+	 * @return this
 	 */
 	this.setTable = function(table) {
 		//Argument 1 must be a string
 		this.argument().test(1, 'string');
 		
 		this._table  = table;
-		
 		
 		this.each(function(i, model) {
 			model.setTable(table);

@@ -48,7 +48,7 @@ module.exports = require('eden-class').extend(function() {
 	/**
 	 * Returns collection
 	 *
-	 * @return Eden_Sql_Collection
+	 * @return eden/mysql/collection
 	 */
 	this.collection = function(table) {
 		var collection = require('./mysql/collection')().setDatabase(this);
@@ -90,8 +90,10 @@ module.exports = require('eden-class').extend(function() {
 	/**
 	 * Returns the columns and attributes given the table name
 	 *
-	 * @param the name of the table
-	 * @return attay|false
+	 * @param string the name of the table
+	 * @param string|array|function
+	 * @param function callback
+	 * @return this
 	 */
 	this.getColumns = function(table, filters, callback) {
 		
@@ -164,7 +166,7 @@ module.exports = require('eden-class').extend(function() {
 	 * Returns the insert query builder
 	 *
 	 * @param string
-	 * @return Eden_Sql_Insert
+	 * @return eden/mysql/insert
 	 */ 
 	this.insert = function(table) {
 		return require('./mysql/insert')(table);
@@ -281,7 +283,8 @@ module.exports = require('eden-class').extend(function() {
 	/**
 	 * Returns model
 	 *
-	 * @return Eden_Sql_Search
+	 * @param string
+	 * @return eden/mysql/model
 	 */
 	this.model = function(table) {
 		var model = require('./mysql/model')().setDatabase(this);
@@ -298,7 +301,8 @@ module.exports = require('eden-class').extend(function() {
 	 * 
 	 * @param string query
 	 * @param array binded value
-	 * @return array|object
+	 * @param function callback
+	 * @return this
 	 */
 	this.query = function(query, bindings, callback) {
 		this.argument()
@@ -333,7 +337,7 @@ module.exports = require('eden-class').extend(function() {
 	 * Returns the delete query builder
 	 *
 	 * @param string
-	 * @return Eden_Sql_Delete
+	 * @return eden/mysql/delete
 	 */ 
 	this.remove = function(table) {
 		return require('./mysql/delete')(table);
@@ -384,7 +388,7 @@ module.exports = require('eden-class').extend(function() {
 	 * Returns the select query builder
 	 *
 	 * @param string
-	 * @return Eden_Sql_Select
+	 * @return eden/mysql/select
 	 */ 
 	this.select = function(columns) {
 		return require('./mysql/select')(columns);
@@ -393,7 +397,7 @@ module.exports = require('eden-class').extend(function() {
 	/**
 	 * Returns search
 	 *
-	 * @return Eden_Sql_Search
+	 * @return eden/mysql/search
 	 */
 	this.search = function(table) {
 		return require('./mysql/search')(this).setTable(table);
@@ -407,7 +411,7 @@ module.exports = require('eden-class').extend(function() {
 	 * @param string value
 	 * @param object setting
 	 * @param function callback
-	 * @return var
+	 * @return this
 	 */
 	this.setRow = function(table, column, value, setting, callback) {
 		this.argument()
@@ -438,7 +442,7 @@ module.exports = require('eden-class').extend(function() {
 	 * Returns the update query builder
 	 *
 	 * @param string
-	 * @return Eden_Sql_Update
+	 * @return eden/mysql/update
 	 */ 
 	this.update = function(table) {
 		return require('./mysql/update')(table);

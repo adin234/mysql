@@ -75,7 +75,8 @@ module.exports = require('eden-model').extend(function() {
 	 * Inserts model to database
 	 *
 	 * @param string
-	 * @param Eden_Sql_Database
+	 * @param eden/mysql
+	 * @param function callback
 	 * @return this
 	 */
 	this.insert = function(table, database, callback) {
@@ -151,8 +152,8 @@ module.exports = require('eden-model').extend(function() {
 	 * Removes model from database
 	 *
 	 * @param string
-	 * @param Eden_Sql_Database
-	 * @param string|array|null
+	 * @param eden/mysql
+	 * @param function callback
 	 * @return this
 	 */
 	this.remove = function(table, database, callback) {
@@ -233,8 +234,8 @@ module.exports = require('eden-model').extend(function() {
 	 * Inserts or updates model to database
 	 *
 	 * @param string
-	 * @param Eden_Sql_Database
-	 * @param string|array|null
+	 * @param eden/mysql
+	 * @param function callback
 	 * @return this
 	 */
 	this.save = function(table, database, callback) {
@@ -296,7 +297,7 @@ module.exports = require('eden-model').extend(function() {
 	/**
 	 * Sets the default database
 	 *
-	 * @param Eden_Sql
+	 * @param eden/mysql
 	 */
 	this.setDatabase = function(database) {
 		this.argument().test(1, 'object');
@@ -309,6 +310,7 @@ module.exports = require('eden-model').extend(function() {
 	 * Sets the default database
 	 *
 	 * @param string
+	 * @return this
 	 */
 	this.setTable = function(table) {
 		//Argument 1 must be a string
@@ -322,8 +324,8 @@ module.exports = require('eden-model').extend(function() {
 	 * Updates model to database
 	 *
 	 * @param string
-	 * @param Eden_Sql_Database
-	 * @param string|array|null
+	 * @param eden/mysql
+	 * @param function callback
 	 * @return this
 	 */
 	this.update = function(table, database, callback) {
