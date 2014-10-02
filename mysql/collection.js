@@ -23,9 +23,12 @@ module.exports = require('eden-collection').extend(function() {
 			return this._list.length;
 		}
 		
-		if(typeof name === 'number'
-		&& typeof this._list[name] !== 'undefined') {
-			return this._list[name];
+		var index = parseInt(name);
+		
+		if(typeof index === 'number'
+		&& !isNaN(index)
+		&& typeof this._list[index] !== 'undefined') {
+			return this._list[index];
 		}
 		
 		var length = this._list.length;

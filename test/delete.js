@@ -1,7 +1,7 @@
 var assert = require('assert');
 var mysql = require('../mysql');
 
-var database = mysql('localhost', 3306, 'blog', 'root');
+var database = mysql('127.0.0.1', 3306, 'edenjs_test', 'root');
 
 describe('MySQL DELETE Test Suite', function() {
 	describe('Functional Tests', function() {
