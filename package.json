@@ -15,10 +15,10 @@
     "mocha-jshint": "0.0.9"
   },
   "dependencies": {
-	"eden-class": "0.0.20",
-	"eden-time": "0.0.20",
-	"eden-collection": "0.0.20",
-	"eden-model": "0.0.20",
+	"eden-class": "0.0.21",
+	"eden-time": "0.0.21",
+	"eden-collection": "0.0.21",
+	"eden-model": "0.0.21",
 	"mysql": "2.5.0"
   },
   "main": "./mysql.js",
