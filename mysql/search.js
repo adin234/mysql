@@ -247,7 +247,9 @@ module.exports = require('eden-class').extend(function() {
 	 * @return this
 	 */
 	this.getTotal = function(callback) {
-		var query 	= this._getQuery().select('COUNT(*) as total');
+		var query 	= this._getQuery();
+		
+		query[0].select('COUNT(*) as total');
 		
 		this._database.query(query[0].getQuery(), query[1], function(error, rows) {
 			if(error) {
