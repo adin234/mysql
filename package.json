@@ -1,7 +1,7 @@
 {
   "name": "eden-mysql",
   "description": "Eden Node JS MySQL Library",
-  "version": "0.0.27",
+  "version": "0.0.28",
   "author": {
     "name": "Christian Blanquera",
     "email": "cblanquera@openovate.com"
@@ -15,10 +15,10 @@
     "mocha-jshint": "0.0.9"
   },
   "dependencies": {
-	"eden-class": "0.0.27",
-	"eden-time": "0.0.27",
-	"eden-collection": "0.0.27",
-	"eden-model": "0.0.27",
+	"eden-class": "0.0.28",
+	"eden-time": "0.0.28",
+	"eden-collection": "0.0.28",
+	"eden-model": "0.0.28",
 	"mysql": "2.5.0"
   },
   "main": "./mysql.js",
