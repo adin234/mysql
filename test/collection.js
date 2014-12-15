@@ -1,7 +1,6 @@
 var assert = require('assert');
 var mysql = require('../mysql');
-
-var database = mysql('127.0.0.1', 3306, 'edenjs_test', 'root');
+var database = mysql('127.0.0.1', 3306, 'edenjs_test', 'root','Openovatelabs1234');
 
 describe('MySQL Collection Test Suite', function() {
 	describe('Functional Tests', function() {
@@ -81,7 +80,7 @@ describe('MySQL Collection Test Suite', function() {
 						collection.remove(function(errors, collection, meta) {
 							assert.equal('bar', collection[0].foo);
 							assert.equal('Bobby3', collection[1].user_name);
-							done();
+					 		done();
 						});
 					});
 				});
