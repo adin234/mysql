@@ -16,6 +16,7 @@ npm install eden-mysql
 
 ```
 var mysql = require('eden-mysql');
+var database = mysql('127.0.0.1', 3306, 'edenjs_test', 'root', 'Openovatelabs1234');
 ```
 
 ## Methods
@@ -77,13 +78,22 @@ Returns collection
 ##### Code
 
 ```
-mysql().collection();
+database.collection('eden_user')
+.add({})
+.add({})
+.setFoo('bar')
+.setUserName('Bobby2')
+.setUserEmail('bobby2@gmail.com')
+.setUserFacebook(123) });
+    collection[0].foo;
+    collection[1].user_email;
 ```
 
 ##### Outputs
 
 ```
-RESULTS
+'bar'
+'bobby2@gmail.com'
 ```
 
 ---
@@ -111,13 +121,16 @@ Connects to the database
 ##### Code
 
 ```
-mysql().connect();
+var database = mysql('127.0.0.1', 3306, 'edenjs_test', 'root', 'Openovatelabs1234');
+var connect = database.connect(['127.0.0.1', 3306, 'edenjs_test', 'root', 'Openovatelabs1234']);
+
+database == connect;
 ```
 
 ##### Outputs
 
 ```
-RESULTS
+true
 ```
 
 ---
@@ -145,13 +158,18 @@ Returns the connection object if no connection has been made it will attempt to 
 ##### Code
 
 ```
-mysql().getConnection();
+var database = mysql('127.0.0.1', 3306, 'edenjs_test', 'root', 'Openovatelabs1234');
+  database.getConnection();
 ```
 
 ##### Outputs
 
 ```
-RESULTS
+'127.0.0.1', 
+3306, 
+'edenjs_test', 
+'root', 
+null
 ```
 
 ---
@@ -183,13 +201,17 @@ Returns the columns and attributes given the table name
 ##### Code
 
 ```
-mysql().getColumns();
+database.getColumns('eden_post', 
+  ([1, 7, 'Take 5', 'You can work now']),
+  function(error, row));
+
+row;
 ```
 
 ##### Outputs
 
 ```
-RESULTS
+7
 ```
 
 ---
@@ -223,13 +245,19 @@ Returns a 1 row result given the column name and the value
 ##### Code
 
 ```
-mysql().getRow();
+database.getRow('eden_user', 'user_email', 'bob@gmail.com', function(error, row));
+  row.user_name;
+
+database.getRow('eden_user', 'user_email', 'dayle@gmail.com', function(error, row));
+  row;
 ```
 
 ##### Outputs
 
 ```
-RESULTS
+'bobby'
+
+null
 ```
 
 ---
@@ -257,13 +285,31 @@ Returns the insert query builder
 ##### Code
 
 ```
-mysql().insert();
+var query = database.insert('user')
+  .set('user_name', 'chris')
+  .set('user_age', 21)
+  .getQuery();
+
+query = database.insert('user')
+  .set('user_name', 'chris', 0)
+  .set('user_age', 21, 0)
+  .set('user_age', 22, 1)
+  .getQuery();
+
+query = database.insert('user')
+  .set({user_name: 'chris', user_age: 21})
+  .set({user_name: 'dan', user_age: 22}, 1)
+  .getQuery();
 ```
 
 ##### Outputs
 
 ```
-RESULTS
+'INSERT INTO user (user_name, user_age) VALUES (\'chris\', 21);'
+
+'INSERT INTO user (user_name, user_age) VALUES (\'chris\', 21), (?, 22);'
+
+'INSERT INTO user (user_name, user_age) VALUES (\'chris\', 21), (\'dan\', 22)'
 ```
 
 ---
@@ -297,13 +343,18 @@ Inserts data into a table and returns the ID
 ##### Code
 
 ```
-mysql().insertRow();
+database.insertRow('eden_user', {
+  user_name: 'bob',
+  user_email: 'bob@gmail.com',
+  user_facebook: 123 });
+
+row.insertId > 1;
 ```
 
 ##### Outputs
 
 ```
-RESULTS
+true
 ```
 
 ---
@@ -337,13 +388,22 @@ Inserts multiple rows into a table
 ##### Code
 
 ```
-mysql().insertRows();
+database.insertRows('eden_user', [{
+  user_name: 'bob',
+  user_email: 'bob@gmail.com',
+  user_facebook: 123
+}, {
+  user_name: 'chris',
+  user_email: 'bob@gmail.com',
+  user_facebook: 312 }]);
+
+row.insertId > 1;
 ```
 
 ##### Outputs
 
 ```
-RESULTS
+true
 ```
 
 ---
@@ -371,13 +431,18 @@ Returns model
 ##### Code
 
 ```
-mysql().model();
+database.model('eden_user')
+  .setUserName('Bobby')
+  .setUserEmail('bobby@gmail.com')
+  .setUserFacebook(123);
+model.setUserName('Billy').save(function(error, model, meta));
+error;
 ```
 
 ##### Outputs
 
 ```
-RESULTS
+null
 ```
 
 ---
@@ -409,13 +474,15 @@ Queries the database
 ##### Code
 
 ```
-mysql().query();
+database.query('SELECT * FROM eden_user');
+
+rows.length > 0;
 ```
 
 ##### Outputs
 
 ```
-RESULTS
+true
 ```
 
 ---
@@ -443,13 +510,16 @@ Returns the delete query builder
 ##### Code
 
 ```
-mysql().remove();
+var query = database
+  .remove('user')
+  .where('user_id = ?')
+  .getQuery();
 ```
 
 ##### Outputs
 
 ```
-RESULTS
+'DELETE FROM user WHERE user_id = ?;'
 ```
 
 ---
@@ -481,13 +551,17 @@ Removes rows that match a filter
 ##### Code
 
 ```
-mysql().removeRows();
+database.removeRows('eden_user', 
+  [['user_email = ?', 'bob@gmail.com']],
+  function(error, row));
+
+typeof row == 'object';
 ```
 
 ##### Outputs
 
 ```
-RESULTS
+true
 ```
 
 ---
@@ -515,13 +589,54 @@ Returns the select query builder
 ##### Code
 
 ```
-mysql().select();
+var query = database.select('*')
+  .from('user')
+  .innerJoin('post', 'post_user=user_id', false)
+  .where('user_name = ?')
+  .sortBy('user_name')
+  .groupBy('user_id')
+  .limit(1, 2)
+  .getQuery();
+
+  query = database.select('*')
+  .from('user')
+  .leftJoin('post', 'post_user=user_id', false)
+  .where('user_name = ?')
+  .sortBy('user_name', 'DESC')
+  .groupBy('user_id')
+  .limit(1, 2)
+  .getQuery();
+
+query = database.select('*')
+  .from('user')
+  .rightJoin('post', 'post_user=user_id', false)
+  .where('user_name = ?')
+  .sortBy('user_name')
+  .getQuery();
+
+query = database.select('*')
+  .from('user')
+  .outerJoin('post', 'post_user')
+  .where('user_name = ?')
+  .groupBy('user_id')
+  .limit(1, 2)
+  .getQuery();
 ```
 
 ##### Outputs
 
 ```
-RESULTS
+'SELECT * FROM user INNER JOIN post ON (post_user=user_id) '
+  + 'WHERE user_name = ? GROUP BY user_id ORDER BY user_name ASC LIMIT 1,2;'
+
+'SELECT * FROM user LEFT JOIN post ON (post_user=user_id) '
+  + 'WHERE user_name = ? GROUP BY user_id ORDER BY user_name DESC LIMIT 1,2;'
+
+'SELECT * FROM user RIGHT JOIN post ON (post_user=user_id) '
+  + 'WHERE user_name = ? ORDER BY user_name ASC;'
+
+'SELECT * FROM user OUTER JOIN post USING (post_user) '
+  + 'WHERE user_name = ? GROUP BY user_id LIMIT 1,2;'
 ```
 
 ---
@@ -547,13 +662,23 @@ Returns search
 ##### Code
 
 ```
-mysql().search();
+database.search('eden_user')
+  .addFilter('user_name = ?', 'Christian Blanquera')
+  .getRow(function(error, row, meta));
+    row.user_email;
+
+database.search('eden_post')
+  .innerJoinOn('eden_user', 'post_user=user_id')
+  .getRows(function(error, rows));
+    rows.length;
 ```
 
 ##### Outputs
 
 ```
-RESULTS
+'cblanquera@gmail.com'
+
+'number'
 ```
 
 ---
@@ -589,13 +714,17 @@ Sets only 1 row given the column name and the value
 ##### Code
 
 ```
-mysql().setRow();
+database.setRow('eden_user', 'user_name', 'Christian Blanquera', {
+  user_email: 'cblanquera@gmail.com'
+}, function(error, row));
+
+row.user_email;
 ```
 
 ##### Outputs
 
 ```
-RESULTS
+'cblanquera@gmail.com'
 ```
 
 ---
@@ -623,20 +752,32 @@ Returns the update query builder
 ##### Code
 
 ```
-mysql().update();
+var query = database.update('user')
+  .set('user_name', 'chris')
+  .set('user_age', 21)
+  .where('user_id = ?')
+  .where('user_name = ?')
+  .getQuery();
+
+query = database.update('user')
+  .set({user_name: 'chris', user_age: 21})
+  .where(['user_id = ?', 'user_name = ?'])
+  .getQuery();
 ```
 
 ##### Outputs
 
 ```
-RESULTS
+'UPDATE user SET user_name = \'chris\', user_age = 21 WHERE user_id = ? AND user_name = ?;'
+
+'UPDATE user SET user_name = \'chris\', user_age = 21 WHERE user_id = ? AND user_name = ?;'
 ```
 
 ---
 
 <a name="updateRows"></a>
 
-### updateRows
+### updatesRows
 
 ```
  this updateRows(String, Object, Array, Array|bool|null, Function);
@@ -665,11 +806,15 @@ Updates rows that match a filter given the update settings
 ##### Code
 
 ```
-mysql().updateRows();
+database.updateRows('eden_user', {
+  user_name: 'bobby'
+}, [['user_email = ?, 'bob@gmail.com']]);
+
+typeof row == 'object';
 ```
 
 ##### Outputs
 
 ```
-RESULTS
+true
 ```
