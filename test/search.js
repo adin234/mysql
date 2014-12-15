@@ -1,7 +1,7 @@
 var assert = require('assert');
 var mysql = require('../mysql');
 
-var database = mysql('127.0.0.1', 3306, 'edenjs_test', 'root');
+var database = mysql('127.0.0.1', 3306, 'edenjs_test', 'root', 'Openovatelabs1234');
 
 describe('MySQL Search Test Suite', function() {
 	describe('Functional Tests', function() {
