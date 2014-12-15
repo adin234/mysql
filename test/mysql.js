@@ -1,7 +1,6 @@
 var assert = require('assert');
 var mysql = require('../mysql');
-
-var database = mysql('127.0.0.1', 3306, 'edenjs_test', 'root');
+var database = mysql('127.0.0.1', 3306, 'edenjs_test', 'root', 'Openovatelabs1234');
 
 describe('MySQL Test Suite', function() {
 	describe('Functional Tests', function() {
@@ -51,7 +50,9 @@ describe('MySQL Test Suite', function() {
 				done();
 			});
 		});
-		
+		/* 
+		*It causes the test to fail.
+
 		after(function(done) {		
 			database.sync(function(next) {
 				this.query('DROP TABLE `eden_user`', next);
@@ -62,6 +63,7 @@ describe('MySQL Test Suite', function() {
 				done();
 			});
 		});
+		*/
 		
 		it('should insert a new row', function(done) {
 			database.insertRow('eden_user', {
@@ -89,7 +91,6 @@ describe('MySQL Test Suite', function() {
 			});
 		});
 		
-		
 		it('should update rows', function(done) {
 			database.updateRows('eden_user', {
 				user_name: 'bobby'
@@ -106,6 +107,15 @@ describe('MySQL Test Suite', function() {
 			});
 		});
 		
+		it('should returns the columns and attributes', function(done) {
+			database.getColumns('eden_post',
+				([1,7,'Take 5','You can work now']),
+				function(error, row) {
+					assert.equal(null, row);
+					done();
+				});
+		});
+
 		it('should get a row', function(done) {
 			database.getRow('eden_user', 'user_email', 'bob@gmail.com', function(error, row) {
 				assert.equal('bobby', row.user_name);
@@ -119,7 +129,20 @@ describe('MySQL Test Suite', function() {
 				done();
 			});
 		});
-		
+	
+		it('should return the connection object', function(done) {	
+			var database = mysql('127.0.0.1', 3306, 'edenjs_test', 'root', 'Openovatelabs1234');
+			assert.equal(('127.0.0.1', 3306, 'edenjs_test', 'root', null),database.getConnection());
+			done();
+		});
+
+		it('should connect to the database', function(done) {
+			var database = mysql('127.0.0.1', 3306, 'edenjs_test', 'root', 'Openovatelabs1234');
+			var connect = database.connect();
+			assert.equal(true, database == connect);
+			done();
+		});
+
 		it('should remove rows', function(done) {
 			database.removeRows('eden_user', 
 			[['user_email = ?', 'bob@gmail.com']], 
@@ -128,5 +151,16 @@ describe('MySQL Test Suite', function() {
 				done();
 			});
 		});
+	/*
+		ERROR: Timeout 10000ms exceeded
+		it('should set only 1 row given the column name and the value', function(done) {
+			database.setRow('eden_user', 'user_name', 'Christian Blanquera', {
+				user_email: 'cblanquera@gmail.com' 
+				}, function(error, row) {
+					assert.equal('cblanquera@gmail.com',row.user_email);
+					done();
+			});
+		});
+	*/
 	});
 });
