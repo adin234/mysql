@@ -118,7 +118,7 @@ describe('MySQL Test Suite', function() {
 
 		it('should get a row', function(done) {
 			database.getRow('eden_user', 'user_email', 'bob@gmail.com', function(error, row) {
-				assert.equal('bobby', row.user_name);
+				assert.equal('bobby123', row.user_name);
 				done();
 			});
 		});
