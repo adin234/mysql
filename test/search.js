@@ -1,11 +1,11 @@
 var assert = require('assert');
 var mysql = require('../mysql');
 
-var database = mysql('127.0.0.1', 3306, 'edenjs_test', 'root', 'Openovatelabs1234');
+var database = require(__dirname + '/database')();
 
 describe('MySQL Search Test Suite', function() {
 	describe('Functional Tests', function() {
-		before(function(done) {		
+		before(function(done) {
 			database.sync(function(next) {
 				this.query('CREATE TABLE IF NOT EXISTS `eden_user` (\
 				  `user_id` int(10) unsigned NOT NULL,\
@@ -27,13 +27,13 @@ describe('MySQL Search Test Suite', function() {
 			}).then(function(error, rows, meta, next) {
 				this.query('ALTER TABLE `eden_user` ADD PRIMARY KEY (`user_id`);', next);
 			})
-			
+
 			.then(function(error, rows, meta, next) {
 				this.query('ALTER TABLE `eden_post` MODIFY `post_id` int(10) unsigned NOT NULL AUTO_INCREMENT;', next);
 			}).then(function(error, rows, meta, next) {
 				this.query('ALTER TABLE `eden_user` MODIFY `user_id` int(10) unsigned NOT NULL AUTO_INCREMENT', next);
 			})
-			
+
 			.then(function(error, rows, meta, next) {
 				this.query("INSERT INTO `eden_post` \
 					(`post_id`, `post_user`, `post_title`, `post_detail`) VALUES\
@@ -51,8 +51,8 @@ describe('MySQL Search Test Suite', function() {
 				done();
 			});
 		});
-		
-		after(function(done) {		
+
+		after(function(done) {
 			database.sync(function(next) {
 				this.query('DROP TABLE `eden_user`', next);
 			}).then(function(error, rows, meta, next) {
@@ -62,24 +62,24 @@ describe('MySQL Search Test Suite', function() {
 				done();
 			});
 		});
-		
+
 		it('should get rows', function(done) {
 			database.search('eden_user').getRows(function(error, rows) {
 				assert.equal('number', typeof rows.length);
 				done();
 			});
 		});
-		
+
 		it('should get row', function(done) {
 			database.search('eden_user')
 			.addFilter('user_name = ?', 'Christian Blanquera')
 			.getRow(function(error, row, meta) {
 				assert.equal('cblanquera@gmail.com', row.user_email);
-				
+
 				done();
 			});
 		});
-		
+
 		it('should get rows with joins', function(done) {
 			database.search('eden_post')
 			.innerJoinOn('eden_user', 'post_user=user_id')
@@ -88,7 +88,7 @@ describe('MySQL Search Test Suite', function() {
 				done();
 			});
 		});
-		
+
 		it('should get rows with magic', function(done) {
 			database.search('eden_post')
 			.innerJoinOn('eden_user', 'post_user=user_id')
@@ -98,7 +98,7 @@ describe('MySQL Search Test Suite', function() {
 				done();
 			});
 		});
-		
+
 		it('should get rows with magic sorting', function(done) {
 			database.search('eden_post')
 			.innerJoinOn('eden_user', 'post_user=user_id')
@@ -109,7 +109,7 @@ describe('MySQL Search Test Suite', function() {
 				done();
 			});
 		});
-		
+
 		it('should get collection', function(done) {
 			database.search('eden_post')
 			.innerJoinOn('eden_user', 'post_user=user_id')
@@ -120,7 +120,7 @@ describe('MySQL Search Test Suite', function() {
 				done();
 			});
 		});
-		
+
 		it('should get collection modify and save', function(done) {
 			database.search('eden_post')
 			.innerJoinOn('eden_user', 'post_user=user_id')
@@ -129,11 +129,11 @@ describe('MySQL Search Test Suite', function() {
 			.getCollection(function(error, collection, meta) {
 				collection.setUserFacebook(321).save(function(error, collection, meta) {
 					assert.equal(321, collection[0].getUserFacebook());
-					done();	
+					done();
 				});
 			});
 		});
-		
+
 		it('should get model', function(done) {
 			database.search('eden_post')
 			.innerJoinOn('eden_user', 'post_user=user_id')
@@ -144,7 +144,7 @@ describe('MySQL Search Test Suite', function() {
 				done();
 			});
 		});
-		
+
 		it('should get model modify and save', function(done) {
 			database.search('eden_post')
 			.innerJoinOn('eden_user', 'post_user=user_id')
@@ -153,7 +153,7 @@ describe('MySQL Search Test Suite', function() {
 			.getModel(function(error, model, meta) {
 				model.setUserFacebook(10204676425696496).save(function(error, collection, meta) {
 					assert.equal(10204676425696496, model.getUserFacebook());
-					done();	
+					done();
 				});
 			});
 		});

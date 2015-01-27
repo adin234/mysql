@@ -4,7 +4,7 @@ module.exports = require('eden-class').extend(function() {
 	var resource 	= require('mysql');
 	var model 		= require('./mysql/model');
 	var collection 	= require('./mysql/collection');
-	
+
 	/* Constants
 	-------------------------------*/
 	/* Public.Properties
@@ -13,11 +13,11 @@ module.exports = require('eden-class').extend(function() {
 	-------------------------------*/
 	this._connection	= null;
 	this._config 		= {};
-	
+
 	/* Private Properties
 	-------------------------------*/
 	var __noop = function() {};
-	
+
 	/* Magic
 	-------------------------------*/
 	this.___construct = function(host, port, name, user, pass) {
@@ -27,22 +27,22 @@ module.exports = require('eden-class').extend(function() {
 			.test(3, 'string')
 			.test(4, 'string')
 			.test(5, 'string', 'undef');
-		
+
 		pass = pass || '';
 		port = port || 3306;
 		if(typeof host === 'object') {
 			this._config = host;
 			return;
 		}
-		
+
 		this._config = {
 			host		: host,
 			user		: user,
 			port		: port,
 			password	: pass || '',
-			database	: name };	
+			database	: name };
 	};
-	
+
 	/* Public.Methods
 	-------------------------------*/
 	/**
@@ -52,17 +52,17 @@ module.exports = require('eden-class').extend(function() {
 	 */
 	this.collection = function(table) {
 		var collection = require('./mysql/collection')().setDatabase(this);
-			
-		if(typeof table === 'string' && table.length) {	
+
+		if(typeof table === 'string' && table.length) {
 			collection.setTable(table);
 		}
-		
+
 		return collection;
 	};
-	
+
 	/**
 	 * Connects to the database
-	 * 
+	 *
 	 * @param array the connection options
 	 * @return this
 	 */
@@ -71,13 +71,13 @@ module.exports = require('eden-class').extend(function() {
 			this._connection = resource.createConnection(this._config);
 			this._connection.connect();
 		}
-		
+
 		return this;
 	};
-	
+
 	/**
 	 * Returns the connection object
-	 * if no connection has been made 
+	 * if no connection has been made
 	 * it will attempt to make it
 	 *
 	 * @param array connection options
@@ -86,7 +86,7 @@ module.exports = require('eden-class').extend(function() {
 	this.getConnection = function() {
 		return this._connection;
 	};
-	
+
 	/**
 	 * Returns the columns and attributes given the table name
 	 *
@@ -96,23 +96,23 @@ module.exports = require('eden-class').extend(function() {
 	 * @return this
 	 */
 	this.getColumns = function(table, filters, callback) {
-		
+
 		//Argument 1 must be a string
 		this.argument()
 			.test(1, 'string')
 			.test(2, 'string', 'array', 'function')
 			.test(3, 'function', 'undef');
-		
+
 		if(typeof filters === 'function') {
 			callback = filters;
 			filters = [];
 		}
-		
+
 		var bindings = [];
-		
+
 		if(filters instanceof Array) {
 			filters = Array.prototype.slice.apply(filters);
-			
+
 			for(var filter, i = 0; i < filters.length; i++) {
 				filter = Array.prototype.slice.apply(filters[i]);
 				//array('post_id=%s AND post_title IN %s', 123, array('asd'));
@@ -120,16 +120,16 @@ module.exports = require('eden-class').extend(function() {
 				bindings = bindings.concat(filter);
 			}
 		}
-		
+
 		callback = callback || __noop;
-		
+
 		var query = 'SHOW FULL COLUMNS FROM `' + table + '`' + filters.join(' AND ');
-		
+
 		this.query(query, bindings, callback);
-		
+
 		return this;
 	};
-	
+
 	/**
 	 * Returns a 1 row result given the column name and the value
 	 *
@@ -145,33 +145,33 @@ module.exports = require('eden-class').extend(function() {
 			.test(2, 'string')
 			.test(3, 'numeric', 'string', 'boolean')
 			.test(4, 'function', 'undef');
-		
+
 		callback = callback || __noop;
-		
+
 		var query = this.select()
 			.from(table)
 			.where(column + ' = ?')
 			.limit(0, 1)
 			.getQuery();
-			
+
 		this.query(query, [value], function(error, rows) {
 			rows = rows || [];
 			callback(error, rows[0] || null);
 		});
-		
+
 		return this;
 	};
-	
+
 	/**
 	 * Returns the insert query builder
 	 *
 	 * @param string
 	 * @return eden/mysql/insert
-	 */ 
+	 */
 	this.insert = function(table) {
 		return require('./mysql/insert')(table);
 	};
-	
+
 	/**
 	 * Inserts data into a table and returns the ID
 	 *
@@ -187,44 +187,44 @@ module.exports = require('eden-class').extend(function() {
 			.test(2, 'object')
 			.test(3, 'array', 'bool', 'null', 'function', 'undef')
 			.test(4, 'function', 'undef');
-		
+
 		if(typeof bind === 'function') {
 			callback = bind;
 			bind = null;
 		}
-		
+
 		if(bind === null || typeof bind === 'undefined') {
 			bind = true;
 		}
-		
+
 		callback = callback || __noop;
-		
+
 		var query = this.insert(table), bindings = [];
-		
+
 		for(var key in setting) {
 			if(setting.hasOwnProperty(key)) {
 				if(setting[key] === null || typeof setting[key] === 'boolean') {
 					query.set(key, setting[key]);
 					continue;
 				}
-				
-				if( (typeof bind === 'boolean' && bind) 
+
+				if( (typeof bind === 'boolean' && bind)
 				|| (bind instanceof Array && bind.indexOf(key) !== -1)) {
 					bindings.push(setting[key]);
 					setting[key] = '?';
-					
+
 				}
-				
+
 				query.set(key, setting[key]);
 			}
 		}
-		
+
 		//run the query
 		this.query(query.getQuery(), bindings, callback);
-		
+
 		return this;
 	};
-	
+
 	/**
 	 * Inserts multiple rows into a table
 	 *
@@ -240,20 +240,20 @@ module.exports = require('eden-class').extend(function() {
 			.test(2, 'array')
 			.test(3, 'array', 'bool', 'null', 'function')
 			.test(4, 'function', 'undef');
-		
+
 		if(typeof bind === 'function') {
 			callback = bind;
 			bind = null;
 		}
-		
+
 		if(bind === null) {
 			bind = true;
 		}
-		
+
 		callback = callback || __noop;
-		
+
 		var query = this.insert(table), bindings = [];
-		
+
 		for(var key, setting, i = 0; i < settings.length; i++) {
 			setting = settings[i];
 			for(key in setting) {
@@ -262,24 +262,24 @@ module.exports = require('eden-class').extend(function() {
 						query.set(key, setting[key]);
 						continue;
 					}
-					
-					if( (typeof bind === 'boolean' && bind) 
+
+					if( (typeof bind === 'boolean' && bind)
 					|| (bind instanceof Array && bind.indexOf(key) !== -1)) {
 						bindings.push(setting[key]);
-						setting[key] = '?';		
+						setting[key] = '?';
 					}
-					
+
 					query.set(key, setting[key], i);
 				}
 			}
 		}
-		
+
 		//run the query
 		this.query(query.getQuery(), bindings, callback);
-		
+
 		return this;
 	};
-	
+
 	/**
 	 * Returns model
 	 *
@@ -288,17 +288,17 @@ module.exports = require('eden-class').extend(function() {
 	 */
 	this.model = function(table) {
 		var model = require('./mysql/model')().setDatabase(this);
-		
+
 		if(typeof table === 'string' && table.length) {
 			model.setTable(table);
 		}
-		
+
 		return model;
 	};
-	
+
 	/**
 	 * Queries the database
-	 * 
+	 *
 	 * @param string query
 	 * @param array binded value
 	 * @param function callback
@@ -309,40 +309,40 @@ module.exports = require('eden-class').extend(function() {
 			.test(1, 'string')
 			.test(2, 'array', 'function')
 			.test(3, 'function', 'undef');
-		
+
 		if(typeof bindings === 'function') {
 			callback = bindings;
 			bindings = [];
 		}
-		
+
 		//defaults
 		bindings = bindings || [];
 		callback = callback || __noop;
-		
+
 		//if its not connected already
 		if(!this._connection) {
 			//connect
 			this.connect();
 		}
-		
+
 		//prepare the query
 		query = this._connection.format(query, bindings);
-		
+
 		this._connection.query(query, callback);
-		
+
 		return this;
 	};
-	
+
 	/**
 	 * Returns the delete query builder
 	 *
 	 * @param string
 	 * @return eden/mysql/delete
-	 */ 
+	 */
 	this.remove = function(table) {
 		return require('./mysql/delete')(table);
 	};
-	
+
 	/**
 	 * Removes rows that match a filter
 	 *
@@ -357,17 +357,17 @@ module.exports = require('eden-class').extend(function() {
 			.test(1, 'string')
 			.test(2, 'string', 'array')
 			.test(3, 'function', 'undef');
-		
+
 		if(!filters.length) {
 			callback(new Error('Filters cannot be empty.'));
 			return;
 		}
-		
+
 		var query = this.remove(table), bindings = [];
-		
+
 		if(filters instanceof Array) {
 			filters = Array.prototype.slice.apply(filters);
-			
+
 			for(var filter, i = 0; i < filters.length; i++) {
 				filter = Array.prototype.slice.apply(filters[i]);
 				//array('post_id=%s AND post_title IN %s', 123, array('asd'));
@@ -375,25 +375,25 @@ module.exports = require('eden-class').extend(function() {
 				bindings = bindings.concat(filter);
 			}
 		}
-		
+
 		query.where(filters);
-		
+
 		//run the query
 		this.query(query.getQuery(), bindings, callback || __noop);
-		
+
 		return this;
 	};
-	
+
 	/**
 	 * Returns the select query builder
 	 *
 	 * @param string
 	 * @return eden/mysql/select
-	 */ 
+	 */
 	this.select = function(columns) {
 		return require('./mysql/select')(columns);
 	};
-	
+
 	/**
 	 * Returns search
 	 *
@@ -402,7 +402,7 @@ module.exports = require('eden-class').extend(function() {
 	this.search = function(table) {
 		return require('./mysql/search')(this).setTable(table);
 	};
-	
+
 	/**
 	 * Sets only 1 row given the column name and the value
 	 *
@@ -420,34 +420,34 @@ module.exports = require('eden-class').extend(function() {
 			.test(3, 'numeric', 'string', 'boolean')
 			.test(4, 'object')
 			.test(5, 'function', 'undef');
-		
+
 		callback = callback || __noop;
-		
+
 		this.getRow(table, column, value, function(error, row) {
 			if(error) {
 				callback(error);
 				return;
 			}
-			
+
 			if(!row) {
 				this.insert(table, setting, callback);
 				return;
 			}
-			
+
 			this.update(table, [[column + ' = ?', value]], callback);
 		});
 	};
-	
+
 	/**
 	 * Returns the update query builder
 	 *
 	 * @param string
 	 * @return eden/mysql/update
-	 */ 
+	 */
 	this.update = function(table) {
 		return require('./mysql/update')(table);
 	};
-	
+
 	/**
 	 * Updates rows that match a filter given the update settings
 	 *
@@ -465,41 +465,41 @@ module.exports = require('eden-class').extend(function() {
 			.test(3, 'array', 'string')
 			.test(4, 'array', 'bool', 'null', 'function', 'undef')
 			.test(5, 'function', 'undef');
-			
+
 		if(typeof bind === 'function') {
 			callback = bind;
 			bind = null;
 		}
-		
+
 		if(bind === null || typeof bind === 'undefined') {
 			bind = true;
 		}
-		
+
 		callback = callback || __noop;
-		
+
 		var query = this.update(table), bindings = [];
-		
+
 		for(var key in setting) {
 			if(setting.hasOwnProperty(key)) {
 				if(setting[key] === null || typeof setting[key] === 'boolean') {
 					query.set(key, setting[key]);
 					continue;
 				}
-				
-				if( (typeof bind === 'boolean' && bind) 
+
+				if( (typeof bind === 'boolean' && bind)
 				|| (bind instanceof Array && bind.indexOf(key) !== -1)) {
 					bindings.push(setting[key]);
 					setting[key] = '?';
-					
+
 				}
-				
+
 				query.set(key, setting[key]);
 			}
 		}
-		
+
 		if(filters instanceof Array) {
 			filters = Array.prototype.slice.apply(filters);
-			
+
 			for(var filter, i = 0; i < filters.length; i++) {
 				filter = Array.prototype.slice.apply(filters[i]);
 				//array('post_id=%s AND post_title IN %s', 123, array('asd'));
@@ -507,15 +507,15 @@ module.exports = require('eden-class').extend(function() {
 				bindings = bindings.concat(filter);
 			}
 		}
-		
+
 		query.where(filters);
-		
+
 		//run the query
 		this.query(query.getQuery(), bindings, callback);
-		
+
 		return this;
 	};
-	
+
 	/* Protected Methods
 	-------------------------------*/
 	/* Private Methods

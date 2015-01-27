@@ -1,10 +1,10 @@
 var assert = require('assert');
-var mysql = require('../mysql');
-var database = mysql('127.0.0.1', 3306, 'edenjs_test', 'root','Openovatelabs1234');
+var database = require(__dirname + '/database')();
+
 
 describe('MySQL Collection Test Suite', function() {
 	describe('Functional Tests', function() {
-		before(function(done) {		
+		before(function(done) {
 			database.sync(function(next) {
 				this.query('CREATE TABLE IF NOT EXISTS `eden_user` (\
 				  `user_id` int(10) unsigned NOT NULL,\
@@ -21,18 +21,25 @@ describe('MySQL Collection Test Suite', function() {
 				  `post_detail` text NOT NULL\
 				) ENGINE=InnoDB  DEFAULT CHARSET=latin1;', next);
 			}).then(function(error, rows, meta, next) {
+				this.query('CREATE TABLE IF NOT EXISTS `eden_post` (\
+				  `post_id` int(10) unsigned NOT NULL,\
+				  `post_user` integer NOT NULL,\
+				  `post_title` varchar(255) NOT NULL,\
+				  `post_detail` text NOT NULL\
+				) ENGINE=InnoDB  DEFAULT CHARSET=latin1;', next);
+			}).then(function(error, rows, meta, next) {
 				this.query('ALTER TABLE `eden_post` \
 				ADD PRIMARY KEY (`post_id`), ADD KEY `post_user` (`post_user`);', next);
 			}).then(function(error, rows, meta, next) {
 				this.query('ALTER TABLE `eden_user` ADD PRIMARY KEY (`user_id`);', next);
 			})
-			
+
 			.then(function(error, rows, meta, next) {
 				this.query('ALTER TABLE `eden_post` MODIFY `post_id` int(10) unsigned NOT NULL AUTO_INCREMENT;', next);
 			}).then(function(error, rows, meta, next) {
 				this.query('ALTER TABLE `eden_user` MODIFY `user_id` int(10) unsigned NOT NULL AUTO_INCREMENT', next);
 			})
-			
+
 			.then(function(error, rows, meta, next) {
 				this.query("INSERT INTO `eden_post` \
 					(`post_id`, `post_user`, `post_title`, `post_detail`) VALUES\
@@ -50,8 +57,8 @@ describe('MySQL Collection Test Suite', function() {
 				done();
 			});
 		});
-		
-		after(function(done) {		
+
+		after(function(done) {
 			database.sync(function(next) {
 				this.query('DROP TABLE `eden_user`', next);
 			}).then(function(error, rows, meta, next) {
@@ -61,7 +68,7 @@ describe('MySQL Collection Test Suite', function() {
 				done();
 			});
 		});
-		
+
 		it('should save(insert and update) and remove using collection', function(done) {
 			database.collection('eden_user')
 				.add({})
@@ -73,7 +80,7 @@ describe('MySQL Collection Test Suite', function() {
 				.save(function(errors, collection, meta) {
 					assert.equal('bar', collection[0].foo);
 					assert.equal('bobby2@gmail.com', collection[1].user_email);
-					
+
 					collection.setUserName('Bobby3').save(function(errors, collection, meta) {
 						assert.equal('bar', collection[0].foo);
 						assert.equal('Bobby3', collection[1].user_name);
@@ -85,7 +92,7 @@ describe('MySQL Collection Test Suite', function() {
 					});
 				});
 		});
-		
+
 		it('should save(insert and update) and remove using collection and sync', function(done) {
 			database.collection('eden_user')
 				.add({})

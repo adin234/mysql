@@ -1,10 +1,10 @@
 var assert = require('assert');
 var mysql = require('../mysql');
-var database = mysql('127.0.0.1', 3306, 'edenjs_test', 'root', 'Openovatelabs1234');
+var database = require(__dirname + '/database')();
 
 describe('MySQL Test Suite', function() {
 	describe('Functional Tests', function() {
-		before(function(done) {		
+		before(function(done) {
 			database.sync(function(next) {
 				this.query('CREATE TABLE IF NOT EXISTS `eden_user` (\
 				  `user_id` int(10) unsigned NOT NULL,\
@@ -26,13 +26,13 @@ describe('MySQL Test Suite', function() {
 			}).then(function(error, rows, meta, next) {
 				this.query('ALTER TABLE `eden_user` ADD PRIMARY KEY (`user_id`);', next);
 			})
-			
+
 			.then(function(error, rows, meta, next) {
 				this.query('ALTER TABLE `eden_post` MODIFY `post_id` int(10) unsigned NOT NULL AUTO_INCREMENT;', next);
 			}).then(function(error, rows, meta, next) {
 				this.query('ALTER TABLE `eden_user` MODIFY `user_id` int(10) unsigned NOT NULL AUTO_INCREMENT', next);
 			})
-			
+
 			.then(function(error, rows, meta, next) {
 				this.query("INSERT INTO `eden_post` \
 					(`post_id`, `post_user`, `post_title`, `post_detail`) VALUES\
@@ -50,10 +50,10 @@ describe('MySQL Test Suite', function() {
 				done();
 			});
 		});
-		/* 
+		/*
 		*It causes the test to fail.
 
-		after(function(done) {		
+		after(function(done) {
 			database.sync(function(next) {
 				this.query('DROP TABLE `eden_user`', next);
 			}).then(function(error, rows, meta, next) {
@@ -64,7 +64,7 @@ describe('MySQL Test Suite', function() {
 			});
 		});
 		*/
-		
+
 		it('should insert a new row', function(done) {
 			database.insertRow('eden_user', {
 				user_name: 'bob',
@@ -75,7 +75,7 @@ describe('MySQL Test Suite', function() {
 				done();
 			});
 		});
-		
+
 		it('should insert new rows', function(done) {
 			database.insertRows('eden_user', [{
 				user_name: 'bob',
@@ -90,23 +90,23 @@ describe('MySQL Test Suite', function() {
 				done();
 			});
 		});
-		
+
 		it('should update rows', function(done) {
 			database.updateRows('eden_user', {
-				user_name: 'bobby'
+				user_name: 'chris'
 			}, [['user_email = ?', 'bob@gmail.com']], function(error, row) {
 				assert.equal(true, typeof row === 'object');
 				done();
 			});
 		});
-		
+
 		it('should get a simple response', function(done) {
 			database.query('SELECT * FROM eden_user', function(error, rows) {
 				assert(true, rows.length > 0)
 				done();
 			});
 		});
-		
+
 		it('should returns the columns and attributes', function(done) {
 			database.getColumns('eden_post',
 				([1,7,'Take 5','You can work now']),
@@ -118,34 +118,34 @@ describe('MySQL Test Suite', function() {
 
 		it('should get a row', function(done) {
 			database.getRow('eden_user', 'user_email', 'bob@gmail.com', function(error, row) {
-				assert.equal('bobby123', row.user_name);
+				assert.equal('chris', row.user_name);
 				done();
 			});
 		});
-		
+
 		it('should not get a row', function(done) {
 			database.getRow('eden_user', 'user_email', 'dayle@gmail.com', function(error, row) {
 				assert.equal(null, row);
 				done();
 			});
 		});
-	
-		it('should return the connection object', function(done) {	
+
+		it('should return the connection object', function(done) {
 			var database = mysql('127.0.0.1', 3306, 'edenjs_test', 'root', 'Openovatelabs1234');
 			assert.equal(('127.0.0.1', 3306, 'edenjs_test', 'root', null),database.getConnection());
 			done();
 		});
 
 		it('should connect to the database', function(done) {
-			var database = mysql('127.0.0.1', 3306, 'edenjs_test', 'root', 'Openovatelabs1234');
+			var database = require(__dirname + '/database')();
 			var connect = database.connect();
 			assert.equal(true, database == connect);
 			done();
 		});
 
 		it('should remove rows', function(done) {
-			database.removeRows('eden_user', 
-			[['user_email = ?', 'bob@gmail.com']], 
+			database.removeRows('eden_user',
+			[['user_email = ?', 'bob@gmail.com']],
 			function(error, row) {
 				assert.equal(true, typeof row === 'object');
 				done();
@@ -155,7 +155,7 @@ describe('MySQL Test Suite', function() {
 		ERROR: Timeout 10000ms exceeded
 		it('should set only 1 row given the column name and the value', function(done) {
 			database.setRow('eden_user', 'user_name', 'Christian Blanquera', {
-				user_email: 'cblanquera@gmail.com' 
+				user_email: 'cblanquera@gmail.com'
 				}, function(error, row) {
 					assert.equal('cblanquera@gmail.com',row.user_email);
 					done();

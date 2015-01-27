@@ -1,7 +1,7 @@
 var assert = require('assert');
 var mysql = require('../mysql');
 
-var database = mysql('127.0.0.1', 3306, 'edenjs_test', 'root');
+var database = require(__dirname + '/database')();
 
 describe('MySQL SELECT Test Suite', function() {
 	describe('Functional Tests', function() {
@@ -14,10 +14,10 @@ describe('MySQL SELECT Test Suite', function() {
 				.groupBy('user_id')
 				.limit(1, 2)
 				.getQuery();
-			
+
 			assert.equal('SELECT * FROM user INNER JOIN post ON (post_user=user_id) '
 			+ 'WHERE user_name = ? GROUP BY user_id ORDER BY user_name ASC LIMIT 1,2;', query);
-			
+
 			query = database.select('*')
 				.from('user')
 				.leftJoin('post', 'post_user=user_id', false)
@@ -26,20 +26,20 @@ describe('MySQL SELECT Test Suite', function() {
 				.groupBy('user_id')
 				.limit(1, 2)
 				.getQuery();
-			
+
 			assert.equal('SELECT * FROM user LEFT JOIN post ON (post_user=user_id) '
 			+ 'WHERE user_name = ? GROUP BY user_id ORDER BY user_name DESC LIMIT 1,2;', query);
-			
+
 			query = database.select('*')
 				.from('user')
 				.rightJoin('post', 'post_user=user_id', false)
 				.where('user_name = ?')
 				.sortBy('user_name')
 				.getQuery();
-			
+
 			assert.equal('SELECT * FROM user RIGHT JOIN post ON (post_user=user_id) '
 			+ 'WHERE user_name = ? ORDER BY user_name ASC;', query);
-			
+
 			query = database.select('*')
 				.from('user')
 				.outerJoin('post', 'post_user')
@@ -47,7 +47,7 @@ describe('MySQL SELECT Test Suite', function() {
 				.groupBy('user_id')
 				.limit(1, 2)
 				.getQuery();
-			
+
 			assert.equal('SELECT * FROM user OUTER JOIN post USING (post_user) '
 			+ 'WHERE user_name = ? GROUP BY user_id LIMIT 1,2;', query);
 		});

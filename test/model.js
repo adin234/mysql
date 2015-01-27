@@ -1,11 +1,11 @@
 var assert = require('assert');
 var mysql = require('../mysql');
 
-var database = mysql('127.0.0.1', 3306, 'edenjs_test', 'root', 'Openovatelabs1234');
+var database = require(__dirname + '/database')();
 
 describe('MySQL Model Test Suite', function() {
 	describe('Functional Tests', function() {
-		before(function(done) {		
+		before(function(done) {
 			database.sync(function(next) {
 				this.query('CREATE TABLE IF NOT EXISTS `eden_user` (\
 				  `user_id` int(10) unsigned NOT NULL,\
@@ -27,13 +27,13 @@ describe('MySQL Model Test Suite', function() {
 			}).then(function(error, rows, meta, next) {
 				this.query('ALTER TABLE `eden_user` ADD PRIMARY KEY (`user_id`);', next);
 			})
-			
+
 			.then(function(error, rows, meta, next) {
 				this.query('ALTER TABLE `eden_post` MODIFY `post_id` int(10) unsigned NOT NULL AUTO_INCREMENT;', next);
 			}).then(function(error, rows, meta, next) {
 				this.query('ALTER TABLE `eden_user` MODIFY `user_id` int(10) unsigned NOT NULL AUTO_INCREMENT', next);
 			})
-			
+
 			.then(function(error, rows, meta, next) {
 				this.query("INSERT INTO `eden_post` \
 					(`post_id`, `post_user`, `post_title`, `post_detail`) VALUES\
@@ -51,8 +51,8 @@ describe('MySQL Model Test Suite', function() {
 				done();
 			});
 		});
-		
-		after(function(done) {		
+
+		after(function(done) {
 			database.sync(function(next) {
 				this.query('DROP TABLE `eden_user`', next);
 			}).then(function(error, rows, meta, next) {
@@ -62,7 +62,7 @@ describe('MySQL Model Test Suite', function() {
 				done();
 			});
 		});
-		
+
 		it('should save(insert and update) and remove using model', function(done) {
 			database.model('eden_user')
 				.setUserName('Bobby')
@@ -76,11 +76,11 @@ describe('MySQL Model Test Suite', function() {
 							assert.equal(null, error);
 							done();
 						});
-						
+
 					});
 				});
 		});
-		
+
 		it('should save(insert and update) and remove using model and sync', function(done) {
 			database.model('eden_user')
 				.setUserName('Bobby')
