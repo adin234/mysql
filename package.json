@@ -27,6 +27,6 @@
     "url": "https://github.com/edenjs/mysql.git"
   },
   "scripts": {
-    "test": "mocha --harmony"
+    "test": "mocha --harmony test"
   }
 }
