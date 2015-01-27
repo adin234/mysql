@@ -1,7 +1,6 @@
 var assert = require('assert');
 var mysql = require('../mysql');
-
-var database = mysql('127.0.0.1', 3306, 'Openovatelabs1234', 'root', '');
+var database = require(__dirname + '/database')();
 
 describe('MySQL INSERT Test Suite', function() {
 	describe('Functional Tests', function() {
